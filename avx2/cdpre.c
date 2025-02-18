@@ -208,17 +208,15 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
 * Arguments:   - const uint8_t *rk: pointer to input re-key
 *                                  (of length KYBER_INDCPA_BYTES)
 *              - const uint8_t *c_i: pointer to input ciphertext
-*                                  (of length KYBER_INDCPA_BYTES)
+*                             ./     (of length KYBER_INDCPA_BYTES)
 *              - uint8_t *c_j: pointer to output ciphertext
 *                                  (of length KYBER_INDCPA_BYTES)
 **************************************************/
 
-void cdpre_renc(uint8_t rk[KYBER_INDCPA_BYTES],
+void cdpre_renc(const uint8_t rk[KYBER_INDCPA_BYTES],
   const uint8_t c_i[KYBER_INDCPA_BYTES],
   uint8_t c_j[KYBER_INDCPA_BYTES])
 {
-unsigned int i;
-uint8_t seed[KYBER_SYMBYTES];
 polyvec b_i, b_rk;
 poly v_i, v_rk, v_j;
 

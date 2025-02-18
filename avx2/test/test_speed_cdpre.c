@@ -164,5 +164,11 @@ int main(void)
   }
   print_results("cdpre_rkg: ", t, NTESTS);
 
+  for(i=0;i<NTESTS;i++) {
+    t[i] = cpucycles();
+    cdpre_renc(rk, c_i, cj);
+  }
+  print_results("cdpre_rkg: ", t, NTESTS);
+
   return 0;
 }

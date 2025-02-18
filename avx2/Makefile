@@ -121,7 +121,7 @@ clean:
 	-$(RM) -rf test/test_speed512
 	-$(RM) -rf test/test_speed768
 	-$(RM) -rf test/test_speed1024
-  -$(RM) -rf test/test_speed_cdpre512
+	-$(RM) -rf test/test_speed_cdpre512
 	-$(RM) -rf test/test_speed_cdpre768
 	-$(RM) -rf test/test_speed_cdpre1024
 	-$(RM) -rf keccak4x/KeccakP-1600-times4-SIMD256.o

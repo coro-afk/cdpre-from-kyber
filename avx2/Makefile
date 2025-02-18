@@ -7,7 +7,7 @@ NISTFLAGS += -Wno-unused-result -mavx2 -mbmi2 -mpopcnt \
 RM = /bin/rm
 
 SOURCES = kem.c indcpa.c polyvec.c poly.c fq.S shuffle.S ntt.S invntt.S \
-  basemul.S consts.c rejsample.c cbd.c verify.c
+  basemul.S consts.c rejsample.c cbd.c verify.c cdpre.c
 SOURCESKECCAK   = $(SOURCES) fips202.c fips202x4.c symmetric-shake.c \
   keccak4x/KeccakP-1600-times4-SIMD256.o
 HEADERS = params.h align.h kem.h indcpa.h polyvec.h poly.h reduce.h fq.inc shuffle.inc \
@@ -111,9 +111,6 @@ test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h te
 
 
 clean:
-	-$(RM) -rf test/test_speed_cdpre512
-	-$(RM) -rf test/test_speed_cdpre768
-	-$(RM) -rf test/test_speed_cdpre1024
 	-$(RM) -rf *.o *.a *.so
 	-$(RM) -rf test/test_kyber512
 	-$(RM) -rf test/test_kyber768
@@ -124,4 +121,7 @@ clean:
 	-$(RM) -rf test/test_speed512
 	-$(RM) -rf test/test_speed768
 	-$(RM) -rf test/test_speed1024
+	-$(RM) -rf test/test_speed_cdpre512
+	-$(RM) -rf test/test_speed_cdpre768
+	-$(RM) -rf test/test_speed_cdpre1024
 	-$(RM) -rf keccak4x/KeccakP-1600-times4-SIMD256.o

@@ -13,6 +13,13 @@
 #include "symmetric.h"
 #include "randombytes.h"
 
+// 前向声明
+void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
+               const uint8_t pk_j[KYBER_INDCPA_PUBLICKEYBYTES],
+               const uint8_t c_i[KYBER_INDCPA_BYTES],
+               const uint8_t coins[KYBER_SYMBYTES],
+               uint8_t c_j[KYBER_INDCPA_BYTES]);
+
 /*************************************************
 * Name:        unpack_pk
 *
@@ -42,10 +49,10 @@ static void unpack_pk(polyvec *pk,
 * Arguments:   - uint8_t *r: pointer to output serialized secret key
 *              - polyvec *sk: pointer to input vector of polynomials (secret key)
 **************************************************/
-static void pack_sk(uint8_t r[KYBER_INDCPA_SECRETKEYBYTES], polyvec *sk)
-{
-  polyvec_tobytes(r, sk);
-}
+// static void pack_sk(uint8_t r[KYBER_INDCPA_SECRETKEYBYTES], polyvec *sk)
+// {
+//   polyvec_tobytes(r, sk);
+// }
 
 /*************************************************
 * Name:        unpack_sk
@@ -109,28 +116,28 @@ static void unpack_ciphertext(polyvec *b, poly *v, const uint8_t c[KYBER_INDCPA_
 *
 * Returns number of sampled 16-bit integers (at most len)
 **************************************************/
-static unsigned int rej_uniform(int16_t *r,
-                                unsigned int len,
-                                const uint8_t *buf,
-                                unsigned int buflen)
-{
-  unsigned int ctr, pos;
-  uint16_t val0, val1;
+// static unsigned int rej_uniform(int16_t *r,
+//                                 unsigned int len,
+//                                 const uint8_t *buf,
+//                                 unsigned int buflen)
+// {
+//   unsigned int ctr, pos;
+//   uint16_t val0, val1;
 
-  ctr = pos = 0;
-  while(ctr < len && pos <= buflen - 3) {  // buflen is always at least 3
-    val0 = ((buf[pos+0] >> 0) | ((uint16_t)buf[pos+1] << 8)) & 0xFFF;
-    val1 = ((buf[pos+1] >> 4) | ((uint16_t)buf[pos+2] << 4)) & 0xFFF;
-    pos += 3;
+//   ctr = pos = 0;
+//   while(ctr < len && pos <= buflen - 3) {  // buflen is always at least 3
+//     val0 = ((buf[pos+0] >> 0) | ((uint16_t)buf[pos+1] << 8)) & 0xFFF;
+//     val1 = ((buf[pos+1] >> 4) | ((uint16_t)buf[pos+2] << 4)) & 0xFFF;
+//     pos += 3;
 
-    if(val0 < KYBER_Q)
-      r[ctr++] = val0;
-    if(ctr < len && val1 < KYBER_Q)
-      r[ctr++] = val1;
-  }
+//     if(val0 < KYBER_Q)
+//       r[ctr++] = val0;
+//     if(ctr < len && val1 < KYBER_Q)
+//       r[ctr++] = val1;
+//   }
 
-  return ctr;
-}
+//   return ctr;
+// }
 
 #define gen_a(A,B)  gen_matrix(A,B,0)
 #define gen_at(A,B) gen_matrix(A,B,1)

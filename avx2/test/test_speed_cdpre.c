@@ -168,7 +168,7 @@ int main(void)
     t[i] = cpucycles();
     cdpre_renc(rk, ct_i, ct_j);
   }
-  print_results("cdpre_rkg: ", t, NTESTS);
+  print_results("cdpre_renc: ", t, NTESTS);
 
   return 0;
 }

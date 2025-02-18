@@ -155,7 +155,7 @@ int main(void)
 
   for(i=0;i<NTESTS;i++) {
     t[i] = cpucycles();
-    cdpre_rkg(key, ct, sk);
+    cdpre_rkg(sk, pk, ct, seed);
   }
   print_results("cdpre_rkg: ", t, NTESTS);
 

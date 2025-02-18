@@ -17,6 +17,9 @@ HEADERSKECCAK   = $(HEADERS) fips202.h fips202x4.h
 .PHONY: all shared clean
 
 all: \
+  test/test_speed_cdpre512 \
+  test/test_speed_cdpre768 \
+  test/test_speed_cdpre1024 \
   test/test_kyber512 \
   test/test_kyber768 \
   test/test_kyber1024 \
@@ -38,7 +41,7 @@ shared: \
   libpqcrystals_kyber768_avx2.so \
   libpqcrystals_kyber1024_avx2.so \
   libpqcrystals_fips202_ref.so \
-  libpqcrystals_fips202x4_avx2.so \
+  libpqcrystals_fips202x4_avx2
 
 keccak4x/KeccakP-1600-times4-SIMD256.o: \
   keccak4x/KeccakP-1600-times4-SIMD256.c \

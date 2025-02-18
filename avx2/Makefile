@@ -29,6 +29,9 @@ speed: \
   test/test_speed512 \
   test/test_speed768 \
   test/test_speed1024 \
+  test/test_speed_cdpre512 \
+  test/test_speed_cdpre768 \
+  test/test_speed_cdpre1024 \
 
 shared: \
   libpqcrystals_kyber512_avx2.so \
@@ -97,6 +100,15 @@ test/test_speed768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpuc
 test/test_speed1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c randombytes.c
 	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
 
+test/test_speed_cdpre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+
+test/test_speed_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+
+test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+
 
 clean:
 	-$(RM) -rf *.o *.a *.so
@@ -109,4 +121,7 @@ clean:
 	-$(RM) -rf test/test_speed512
 	-$(RM) -rf test/test_speed768
 	-$(RM) -rf test/test_speed1024
+  -$(RM) -rf test/test_speed_cdpre512
+	-$(RM) -rf test/test_speed_cdpre768
+	-$(RM) -rf test/test_speed_cdpre1024
 	-$(RM) -rf keccak4x/KeccakP-1600-times4-SIMD256.o

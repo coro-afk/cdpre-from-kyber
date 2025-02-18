@@ -30,6 +30,7 @@ int main(void)
   uint8_t pk_j[CRYPTO_PUBLICKEYBYTES];
   uint8_t sk_i[CRYPTO_SECRETKEYBYTES];
   uint8_t ct_i[CRYPTO_CIPHERTEXTBYTES];
+  uint8_t rk[CRYPTO_CIPHERTEXTBYTES];
   uint8_t ct_j[CRYPTO_CIPHERTEXTBYTES];
   polyvec matrix[KYBER_K];
   poly ap;

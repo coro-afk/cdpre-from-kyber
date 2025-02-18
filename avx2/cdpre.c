@@ -5,6 +5,7 @@
 #include "align.h"
 #include "params.h"
 #include "indcpa.h"
+#include "cdpre.h"
 #include "polyvec.h"
 #include "poly.h"
 #include "ntt.h"
@@ -12,13 +13,6 @@
 #include "rejsample.h"
 #include "symmetric.h"
 #include "randombytes.h"
-
-// 前向声明
-void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
-               const uint8_t pk_j[KYBER_INDCPA_PUBLICKEYBYTES],
-               const uint8_t c_i[KYBER_INDCPA_BYTES],
-               const uint8_t coins[KYBER_SYMBYTES],
-               uint8_t c_j[KYBER_INDCPA_BYTES]);
 
 /*************************************************
 * Name:        unpack_pk
@@ -163,7 +157,7 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
   const uint8_t pk_j[KYBER_INDCPA_PUBLICKEYBYTES],
   const uint8_t c_i[KYBER_INDCPA_BYTES],
   const uint8_t coins[KYBER_SYMBYTES],
-  uint8_t c_j[KYBER_INDCPA_BYTES])
+  uint8_t rk[KYBER_INDCPA_BYTES])
 {
   unsigned int i;
   uint8_t seed[KYBER_SYMBYTES];
@@ -203,5 +197,38 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
   poly_sub(&v_j, &v_j, &mp);
   poly_reduce(&v_j);
 
-  pack_ciphertext(c_j, &b_j, &v_j);
+  pack_ciphertext(rk, &b_j, &v_j);
+}
+
+/*************************************************
+* Name:        cdpre_renc
+*
+* Description: Re-encryption generation
+*
+* Arguments:   - const uint8_t *rk: pointer to input re-key
+*                                  (of length KYBER_INDCPA_BYTES)
+*              - const uint8_t *c_i: pointer to input ciphertext
+*                                  (of length KYBER_INDCPA_BYTES)
+*              - uint8_t *c_j: pointer to output ciphertext
+*                                  (of length KYBER_INDCPA_BYTES)
+**************************************************/
+
+void cdpre_renc(uint8_t rk[KYBER_INDCPA_BYTES],
+  const uint8_t c_i[KYBER_INDCPA_BYTES],
+  uint8_t c_j[KYBER_INDCPA_BYTES])
+{
+unsigned int i;
+uint8_t seed[KYBER_SYMBYTES];
+polyvec b_i, b_rk;
+poly v_i, v_rk, v_j;
+
+unpack_ciphertext(&b_i, &v_i, c_i);
+unpack_ciphertext(&b_rk, &v_rk, rk);
+
+poly_invntt_tomont(&v_i);
+poly_invntt_tomont(&v_rk);
+poly_add(&v_j, &v_i, &v_rk);
+poly_reduce(&v_j);
+
+pack_ciphertext(c_j, &b_rk, &v_j);
 }

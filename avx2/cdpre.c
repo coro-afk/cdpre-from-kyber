@@ -572,11 +572,14 @@ void indcpa_dec(uint8_t m[KYBER_INDCPA_MSGBYTES],
 *              - const uint8_t *coins: pointer to input random coins used as seed
 *                                      (of length KYBER_SYMBYTES) to deterministically
 *                                      generate all randomness
+*              - const uint8_t *c_j: pointer to output ciphertext
+*                                  (of length KYBER_INDCPA_BYTES)
 **************************************************/
 void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
   const uint8_t pk_j[KYBER_INDCPA_PUBLICKEYBYTES],
   const uint8_t c_i[KYBER_INDCPA_BYTES],
-  const uint8_t coins[KYBER_SYMBYTES])
+  const uint8_t coins[KYBER_SYMBYTES],
+  const uint8_t c_j[KYBER_INDCPA_BYTES])
 {
 unsigned int i;
 uint8_t seed[KYBER_SYMBYTES];

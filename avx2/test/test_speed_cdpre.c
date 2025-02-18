@@ -27,6 +27,10 @@ int main(void)
   uint8_t key[CRYPTO_BYTES];
   uint8_t coins32[KYBER_SYMBYTES];
   uint8_t coins64[2*KYBER_SYMBYTES];
+  uint8_t pk_j[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk_i[CRYPTO_SECRETKEYBYTES];
+  uint8_t ct_i[CRYPTO_CIPHERTEXTBYTES];
+  uint8_t ct_j[CRYPTO_CIPHERTEXTBYTES];
   polyvec matrix[KYBER_K];
   poly ap;
 
@@ -155,7 +159,7 @@ int main(void)
 
   for(i=0;i<NTESTS;i++) {
     t[i] = cpucycles();
-    cdpre_rkg(sk, pk, ct, seed);
+    cdpre_rkg(sk_i, pk_j, ct_i, seed, ct_j);
   }
   print_results("cdpre_rkg: ", t, NTESTS);
 

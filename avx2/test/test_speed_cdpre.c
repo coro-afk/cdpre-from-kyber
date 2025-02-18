@@ -11,7 +11,7 @@
 #include "cpucycles.h"
 #include "speed_print.h"
 
-#include "cdpre.h"
+#include "../cdpre.h"
 
 #define NTESTS 1000
 

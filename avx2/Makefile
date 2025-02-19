@@ -124,7 +124,6 @@ test/test_speed_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h tes
 test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
     $(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
 
-
 clean:
     -$(RM) -rf *.o *.a *.so
     -$(RM) -rf test/test_kyber512

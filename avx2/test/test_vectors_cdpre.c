@@ -22,8 +22,8 @@ int main(void)
   uint8_t ct_i[KYBER_CIPHERTEXTBYTES];
   uint8_t rk[KYBER_CIPHERTEXTBYTES];
   uint8_t ct_j[KYBER_CIPHERTEXTBYTES];
-  uint8_t key_i[KYBER_BYTES];
-  uint8_t key_j[KYBER_BYTES];
+  uint8_t key_i[KYBER_INDCPA_MSGBYTES];
+  uint8_t key_j[KYBER_INDCPA_MSGBYTES];
 
   for (i = 0; i < NTESTS; i++) {
     randombytes(coins32, KYBER_SYMBYTES);

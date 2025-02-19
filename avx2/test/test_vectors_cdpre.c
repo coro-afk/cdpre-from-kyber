@@ -11,16 +11,6 @@
 
 #define NTESTS 1
 
-
-/* Initital state after absorbing empty string 
- * Permute before squeeze is achieved by setting pos to SHAKE128_RATE */
-static keccak_state rngstate = {{0x1F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (1ULL << 63), 0, 0, 0, 0}, SHAKE128_RATE};
-
-void randombytes(uint8_t *x, size_t xlen)
-{
-  shake128_squeeze(x, xlen, &rngstate);
-}
-
 int main(void)
 {
   unsigned int i, j;

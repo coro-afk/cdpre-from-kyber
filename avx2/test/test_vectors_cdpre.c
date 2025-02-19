@@ -55,7 +55,7 @@ int main(void)
     randombytes(coins32, KYBER_SYMBYTES);
 
     // Generate random key_i
-    randombytes(key_i, KYBER_BYTES);
+    randombytes(key_i, KYBER_SSBYTES);
 
     // Encryption
     indcpa_enc(ct_i, key_i, pk_i, coins32);
@@ -64,7 +64,7 @@ int main(void)
       printf("%02x", ct_i[j]);
     printf("\n");
     printf("Shared Secret key_i: ");
-    for (j = 0; j < KYBER_BYTES; j++)
+    for (j = 0; j < KYBER_SSBYTES; j++)
       printf("%02x", key_i[j]);
     printf("\n");
 
@@ -87,7 +87,7 @@ int main(void)
     // Decryption by j
     indcpa_dec(key_j, ct_j, sk_j);
     printf("Shared Secret key_j: ");
-    for (j = 0; j < KYBER_BYTES; j++)
+    for (j = 0; j < KYBER_SSBYTES; j++)
       printf("%02x", key_j[j]);
     printf("\n");
   }

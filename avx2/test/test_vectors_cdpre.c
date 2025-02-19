@@ -63,10 +63,6 @@ int main(void)
     for (j = 0; j < KYBER_CIPHERTEXTBYTES; j++)
       printf("%02x", ct_i[j]);
     printf("\n");
-    printf("Shared Secret key_i: ");
-    for (j = 0; j < KYBER_SSBYTES; j++)
-      printf("%02x", key_i[j]);
-    printf("\n");
 
     randombytes(coins32, KYBER_SYMBYTES);
 
@@ -90,6 +86,19 @@ int main(void)
     for (j = 0; j < KYBER_SSBYTES; j++)
       printf("%02x", key_j[j]);
     printf("\n");
+	
+	// Shared key_i
+	printf("Shared Secret key_i: ");
+    for (j = 0; j < KYBER_SSBYTES; j++)
+      printf("%02x", key_i[j]);
+    printf("\n");
+
+	// Decrypt the encrypted key_i
+	indcpa_dec(key_i, ct_i, sk_i);
+	printf("Encrypted&Decrypted Secret key_i: ");
+	for (j = 0; j < KYBER_SSBYTES; j++)
+	  printf("%02x", key_i[j]);
+	printf("\n");
   }
   return 0;
 }

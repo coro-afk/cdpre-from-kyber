@@ -161,42 +161,41 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
 {
   unsigned int i;
   uint8_t seed[KYBER_SYMBYTES];
-  polyvec sp, pkpv, skpv, ep, at[KYBER_K], b_i, b_j;
-  poly v_i, v_j, mp; // useless error term epp
+  uint8_t nonce = 0;
+  polyvec pkpv, skpv, rp, ep, at[KYBER_K], u_ij, u_i;
+  poly v_i, v_ij, temp;
+  // unpacking
+  unpack_pk(&pkpv, seed, pk_j); // parse pk_j
+  unpack_sk(&skpv, sk_i); // parse sk_j
+  unpack_ciphertext(&u_i, &v_i, c_i); //parse c_i
+  gen_at(at, seed); // generate matrix A^T
 
-  unpack_pk(&pkpv, seed, pk_j);
-  unpack_sk(&skpv, sk_i);
-  unpack_ciphertext(&b_i, &v_i, c_i);
-  gen_at(at, seed);
+  // generate u_ij
+  for(i=0;i<KYBER_K;i++) // generate rp
+  	poly_getnoise_eta1(rp.vec+i, coins, nonce++);
+  polyvec_ntt(&rp);
+  for(i=0;i<KYBER_K;i++) // A^T * rp
+	polyvec_basemul_acc_montgomery(&u_ij.vec[i], &at[i], &rp);
+  for(i=0;i<KYBER_K;i++) // generate ep
+    poly_getnoise_eta2(ep.vec+i, coins, nonce++);
+  polyvec_invntt_tomont(&u_ij);
+  polyvec_add(&u_ij, &u_ij, &ep); // u_ij = A^T * rp + ep
+  
+  polyvec_reduce(&u_ij); // compress u_ij
 
-#if KYBER_K == 2
-  poly_getnoise_eta1122_4x(sp.vec+0, sp.vec+1, ep.vec+0, ep.vec+1, coins, 0, 1, 2, 3);
-#elif KYBER_K == 3
-  poly epp;
-  poly_getnoise_eta1_4x(sp.vec+0, sp.vec+1, sp.vec+2, ep.vec+0, coins, 0, 1, 2 ,3);
-  poly_getnoise_eta1_4x(ep.vec+1, ep.vec+2, &epp, b_j.vec+0, coins,  4, 5, 6, 7);
-#elif KYBER_K == 4
-  poly_getnoise_eta1_4x(sp.vec+0, sp.vec+1, sp.vec+2, sp.vec+3, coins, 0, 1, 2, 3);
-  poly_getnoise_eta1_4x(ep.vec+0, ep.vec+1, ep.vec+2, ep.vec+3, coins, 4, 5, 6, 7);
-#endif
+  // generate v_ij
+  polyvec_basemul_acc_montgomery(&v_ij, &pkpv, &rp); // t_j^T * rp
+  poly_invntt_tomont(&v_ij);
+  polyvec_ntt(&u_i);
+  polyvec_basemul_acc_montgomery(&temp, &skpv, &u_i); // s_i^T * u_i
+  poly_invntt_tomont(&temp);
 
-  polyvec_ntt(&sp);
+  poly_sub(&v_ij, &v_ij, &temp); // v_ij = t_j^T * rp - s_i^T * u_i
+  poly_reduce(&v_ij); // compress v_ij
 
-  // computing u
-  for(i=0;i<KYBER_K;i++)
-    polyvec_basemul_acc_montgomery(&b_j.vec[i], &at[i], &sp);
-  polyvec_invntt_tomont(&b_j);
-  polyvec_add(&b_j, &b_j, &ep);
-  polyvec_reduce(&b_j);
+  // pack ciphertext
+  pack_ciphertext(rk, &u_ij, &v_ij);
 
-  // computing v
-  polyvec_basemul_acc_montgomery(&v_j, &pkpv, &sp);// t_j^T * r
-  polyvec_basemul_acc_montgomery(&mp, &skpv, &b_i); // s_i^T * u_i
-  poly_invntt_tomont(&mp);
-  poly_sub(&v_j, &v_j, &mp);
-  poly_reduce(&v_j);
-
-  pack_ciphertext(rk, &b_j, &v_j);
 }
 
 /*************************************************
@@ -216,16 +215,15 @@ void cdpre_renc(const uint8_t rk[KYBER_INDCPA_BYTES],
   const uint8_t c_i[KYBER_INDCPA_BYTES],
   uint8_t c_j[KYBER_INDCPA_BYTES])
 {
-polyvec b_i, b_rk;
-poly v_i, v_rk, v_j;
+	polyvec u_i, u_j;
+	poly v_ij, v_i, v_j;
 
-unpack_ciphertext(&b_i, &v_i, c_i);
-unpack_ciphertext(&b_rk, &v_rk, rk);
+	unpack_ciphertext(&u_j, &v_ij, rk); // parse rk, and u_j = u_ij
+	unpack_ciphertext(&u_i, &v_i, c_i); // parse c_i
 
-poly_invntt_tomont(&v_i);
-poly_invntt_tomont(&v_rk);
-poly_add(&v_j, &v_i, &v_rk);
-poly_reduce(&v_j);
+	poly_add(&v_j, &v_i, &v_ij); // v_j = v_i + v_ij
+	poly_reduce(&v_j); // compress v_j
+	polyvec_reduce(&u_j); // compress u_j
 
-pack_ciphertext(c_j, &b_rk, &v_j);
+	pack_ciphertext(c_j, &u_j, &v_j); // pack c_j
 }

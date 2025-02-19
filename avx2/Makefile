@@ -88,14 +88,14 @@ test/test_vectors_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_
 test/test_vectors_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_cdpre.c
 	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/test_vectors_cdpre.c -o $@
 
-test/test_kyber512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
+test/test_kyber512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c 
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK)  test/test_kyber.c -o $@
 
-test/test_kyber768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
+test/test_kyber768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c 
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK)  test/test_kyber.c -o $@
 
-test/test_kyber1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
+test/test_kyber1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c 
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK)  test/test_kyber.c -o $@
 
 test/test_vectors512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors.c
 	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) test/test_vectors.c -o $@
@@ -106,23 +106,23 @@ test/test_vectors768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors.c
 test/test_vectors1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors.c
 	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/test_vectors.c -o $@
 
-test/test_speed512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
+test/test_speed512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c 
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK)  test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
 
-test/test_speed768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
+test/test_speed768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c 
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK)  test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
 
-test/test_speed1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
+test/test_speed1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed.c 
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK)  test/cpucycles.c test/speed_print.c test/test_speed.c -o $@
 
-test/test_speed_cdpre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+test/test_speed_cdpre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
 
-test/test_speed_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+test/test_speed_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
 
-test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c randombytes.c
-	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
+test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
 
 clean:
 	-$(RM) -rf *.o *.a *.so

@@ -94,8 +94,7 @@ test/test_kyber512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randomby
 test/test_kyber768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randombytes.c
 	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
 
-test/test_kyber1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber
-.candombytes.c
+test/test_kyber1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber randombytes.c
 	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
 
 test/test_vectors512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors.c

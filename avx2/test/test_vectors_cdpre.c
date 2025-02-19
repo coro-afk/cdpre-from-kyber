@@ -64,6 +64,9 @@ int main(void)
 
     randombytes(coins32, KYBER_SYMBYTES);
 
+    // Generate random key_i
+    randombytes(key_i, CRYPTO_BYTES);
+
     // Encryption
     indcpa_enc(ct_i, key_i, pk_i, coins32);
     printf("Ciphertext ct_i: ");

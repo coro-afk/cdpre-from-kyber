@@ -156,8 +156,8 @@ static void unpack_ciphertext(polyvec *b, poly *v, const uint8_t c[KYBER_INDCPA_
 void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
   const uint8_t pk_j[KYBER_INDCPA_PUBLICKEYBYTES],
   const uint8_t c_i[KYBER_INDCPA_BYTES],
-  const uint8_t coins[KYBER_SYMBYTES],
-  uint8_t rk[KYBER_INDCPA_BYTES])
+  uint8_t rk[KYBER_INDCPA_BYTES],
+  const uint8_t coins[KYBER_SYMBYTES])
 {
   unsigned int i;
   uint8_t seed[KYBER_SYMBYTES];

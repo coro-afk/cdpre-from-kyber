@@ -160,7 +160,7 @@ int main(void)
 
   for(i=0;i<NTESTS;i++) {
     t[i] = cpucycles();
-    cdpre_rkg(sk_i, pk_j, ct_i, seed, ct_j);
+    cdpre_rkg(sk_i, pk_j, ct_i, rk, seed);
   }
   print_results("cdpre_rkg: ", t, NTESTS);
 

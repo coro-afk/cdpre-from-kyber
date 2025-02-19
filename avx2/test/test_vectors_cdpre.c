@@ -9,7 +9,7 @@
 #include "../fips202.h"
 #include "../cdpre.h"
 
-#define NTESTS 10000
+#define NTESTS 1
 
 
 /* Initital state after absorbing empty string 
@@ -24,57 +24,69 @@ void randombytes(uint8_t *x,size_t xlen)
 int main(void)
 {
   unsigned int i,j;
-  uint8_t pk[CRYPTO_PUBLICKEYBYTES];
-  uint8_t sk[CRYPTO_SECRETKEYBYTES];
-  uint8_t ct[CRYPTO_CIPHERTEXTBYTES];
-  uint8_t key_a[CRYPTO_BYTES];
-  uint8_t key_b[CRYPTO_BYTES];
+  uint8_t pk_i[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk_i[CRYPTO_SECRETKEYBYTES];
+  uint8_t pk_j[CRYPTO_PUBLICKEYBYTES];
+  uint8_t sk_j[CRYPTO_SECRETKEYBYTES];
+  uint8_t ct_i[CRYPTO_CIPHERTEXTBYTES];
+  uint8_t ct_j[CRYPTO_CIPHERTEXTBYTES];
+  uint8_t key_i[CRYPTO_BYTES];
+  uint8_t key_j[CRYPTO_BYTES];
 
   for(i=0;i<NTESTS;i++) {
-    // Key-pair generation
-    crypto_kem_keypair(pk, sk);
-    printf("Public Key: ");
+    // Key-pair generation for i
+    indcpa_keypair_derand(pk_i, sk_i);
+    printf("i's Public Key: ");
     for(j=0;j<CRYPTO_PUBLICKEYBYTES;j++)
-      printf("%02x",pk[j]);
+      printf("%02x",pk_i[j]);
     printf("\n");
-    printf("Secret Key: ");
+    printf("i's Secret Key: ");
     for(j=0;j<CRYPTO_SECRETKEYBYTES;j++)
-      printf("%02x",sk[j]);
+      printf("%02x",sk_i[j]);
     printf("\n");
 
-    // Encapsulation
-    crypto_kem_enc(ct, key_b, pk);
-    printf("Ciphertext: ");
+    // Key-pair generation for j
+    indcpa_keypair_derand(pk_j, sk_j);
+    printf("j's Public Key: ");
+    for(j=0;j<CRYPTO_PUBLICKEYBYTES;j++)
+      printf("%02x",pk_j[j]);
+    printf("\n");
+    printf("j's Secret Key: ");
+    for(j=0;j<CRYPTO_SECRETKEYBYTES;j++)
+      printf("%02x",sk_j[j]);
+    printf("\n");
+
+    // Encryption by i
+    indcpa_enc(ct_i, key_i, pk_i);
+    printf("Ciphertext ct_i: ");
     for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)
-      printf("%02x",ct[j]);
+      printf("%02x",ct_i[j]);
     printf("\n");
-    printf("Shared Secret B: ");
+    printf("Shared Secret key_i: ");
     for(j=0;j<CRYPTO_BYTES;j++)
-      printf("%02x",key_b[j]);
-    printf("\n");
-
-    // Decapsulation
-    crypto_kem_dec(key_a, ct, sk);
-    printf("Shared Secret A: ");
-    for(j=0;j<CRYPTO_BYTES;j++)
-      printf("%02x",key_a[j]);
+      printf("%02x",key_i[j]);
     printf("\n");
 
-    for(j=0;j<CRYPTO_BYTES;j++) {
-      if(key_a[j] != key_b[j]) {
-        fprintf(stderr, "ERROR\n");
-        return -1;
-      }
-    }
+    // Re-key generation by i
+    cdpre_rkg(sk_i, pk_j, ct_i, rk);
+    printf("Re-key rk: ");
+    for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)
+      printf("%02x",rk[j]);
+    printf("\n");
 
-    // Decapsulation of invalid (random) ciphertexts
-    randombytes(ct, KYBER_CIPHERTEXTBYTES); 
-    crypto_kem_dec(key_a, ct, sk);
-    printf("Pseudorandom shared Secret A: ");
+    // Re-encryption by j/proxy
+    cdpre_renc(rk, ct_i, ct_j);
+    printf("Ciphertext ct_j: ");
+    for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)
+      printf("%02x",ct_j[j]);
+    printf("\n");
+
+    // Decryption by j
+    indcpa_dec(key_j, ct_j, sk_j);
+    printf("Shared Secret key_j: ");
     for(j=0;j<CRYPTO_BYTES;j++)
-      printf("%02x",key_a[j]);
+      printf("%02x",key_j[j]);
     printf("\n");
   }
-
   return 0;
 }

@@ -17,6 +17,9 @@ HEADERSKECCAK   = $(HEADERS) fips202.h fips202x4.h
 .PHONY: all shared clean
 
 all: \
+  test/test_vectors_cdpre512 \
+  test/test_vectors_cdpre768 \
+  test/test_vectors_cdpre1024 \
   test/test_speed_cdpre512 \
   test/test_speed_cdpre768 \
   test/test_speed_cdpre1024 \
@@ -76,6 +79,15 @@ libpqcrystals_kyber1024_avx2.so: $(SOURCES) $(HEADERS) symmetric-shake.c
 	$(CC) -shared -fpic $(CFLAGS) -DKYBER_K=4 $(SOURCES) \
 	  symmetric-shake.c -o libpqcrystals_kyber1024_avx2.so
 
+test/test_vectors_cdpre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) test/test_vectors_cdpre.c -o $@
+
+test/test_vectors_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) test/test_vectors_cdpre.c -o $@
+
+test/test_vectors_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_cdpre.c
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/test_vectors_cdpre.c -o $@
+
 test/test_kyber512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_kyber.c randombytes.c
 	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) randombytes.c test/test_kyber.c -o $@
 
@@ -127,4 +139,7 @@ clean:
 	-$(RM) -rf test/test_speed_cdpre512
 	-$(RM) -rf test/test_speed_cdpre768
 	-$(RM) -rf test/test_speed_cdpre1024
+	-$(RM) -rf test/test_vectors_cdpre512
+	-$(RM) -rf test/test_vectors_cdpre768
+	-$(RM) -rf test/test_vectors_cdpre1024
 	-$(RM) -rf keccak4x/KeccakP-1600-times4-SIMD256.o

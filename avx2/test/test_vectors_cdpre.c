@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "../kem.h"
+#include "../indcpa.h"
 #include "../randombytes.h"
 #include "../fips202.h"
 #include "../cdpre.h"

@@ -59,7 +59,7 @@ int main(void)
       printf("%02x",sk_j[j]);
     printf("\n");
 
-    // Encryption by i
+    // Encryption
     indcpa_enc(ct_i, key_i, pk_i, coins32);
     printf("Ciphertext ct_i: ");
     for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)

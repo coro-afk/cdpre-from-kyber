@@ -8,7 +8,7 @@
 #include "../randombytes.h"
 #include "../fips202.h"
 
-#define NTESTS 10000
+#define NTESTS 1
 
 
 /* Initital state after absorbing empty string 

@@ -24,18 +24,21 @@ void randombytes(uint8_t *x,size_t xlen)
 int main(void)
 {
   unsigned int i,j;
+  uint8_t coins32[KYBER_SYMBYTES];
   uint8_t pk_i[CRYPTO_PUBLICKEYBYTES];
   uint8_t sk_i[CRYPTO_SECRETKEYBYTES];
   uint8_t pk_j[CRYPTO_PUBLICKEYBYTES];
   uint8_t sk_j[CRYPTO_SECRETKEYBYTES];
   uint8_t ct_i[CRYPTO_CIPHERTEXTBYTES];
+  uint8_t rk[CRYPTO_CIPHERTEXTBYTES];
   uint8_t ct_j[CRYPTO_CIPHERTEXTBYTES];
   uint8_t key_i[CRYPTO_BYTES];
   uint8_t key_j[CRYPTO_BYTES];
+  randombytes(coins32, KYBER_SYMBYTES);
 
   for(i=0;i<NTESTS;i++) {
     // Key-pair generation for i
-    indcpa_keypair_derand(pk_i, sk_i);
+    indcpa_keypair_derand(pk_i, sk_i, coins32);
     printf("i's Public Key: ");
     for(j=0;j<CRYPTO_PUBLICKEYBYTES;j++)
       printf("%02x",pk_i[j]);
@@ -46,7 +49,7 @@ int main(void)
     printf("\n");
 
     // Key-pair generation for j
-    indcpa_keypair_derand(pk_j, sk_j);
+    indcpa_keypair_derand(pk_j, sk_j, coins32);
     printf("j's Public Key: ");
     for(j=0;j<CRYPTO_PUBLICKEYBYTES;j++)
       printf("%02x",pk_j[j]);
@@ -57,7 +60,7 @@ int main(void)
     printf("\n");
 
     // Encryption by i
-    indcpa_enc(ct_i, key_i, pk_i);
+    indcpa_enc(ct_i, key_i, pk_i, coins32);
     printf("Ciphertext ct_i: ");
     for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)
       printf("%02x",ct_i[j]);
@@ -68,7 +71,7 @@ int main(void)
     printf("\n");
 
     // Re-key generation by i
-    cdpre_rkg(sk_i, pk_j, ct_i, rk);
+    cdpre_rkg(sk_i, pk_j, ct_i, rk, coins32);
     printf("Re-key rk: ");
     for(j=0;j<CRYPTO_CIPHERTEXTBYTES;j++)
       printf("%02x",rk[j]);

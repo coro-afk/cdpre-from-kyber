@@ -171,14 +171,12 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
 
 #if KYBER_K == 2
   poly_getnoise_eta1122_4x(sp.vec+0, sp.vec+1, ep.vec+0, ep.vec+1, coins, 0, 1, 2, 3);
-  poly_getnoise_eta2(&epp, coins, 4);
 #elif KYBER_K == 3
   poly_getnoise_eta1_4x(sp.vec+0, sp.vec+1, sp.vec+2, ep.vec+0, coins, 0, 1, 2 ,3);
   poly_getnoise_eta1_4x(ep.vec+1, ep.vec+2, &epp, b_j.vec+0, coins,  4, 5, 6, 7);
 #elif KYBER_K == 4
   poly_getnoise_eta1_4x(sp.vec+0, sp.vec+1, sp.vec+2, sp.vec+3, coins, 0, 1, 2, 3);
   poly_getnoise_eta1_4x(ep.vec+0, ep.vec+1, ep.vec+2, ep.vec+3, coins, 4, 5, 6, 7);
-  poly_getnoise_eta2(&epp, coins, 8);
 #endif
 
   polyvec_ntt(&sp);

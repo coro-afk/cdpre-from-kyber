@@ -11,7 +11,7 @@
 
 #include "../cdpre.h"
 
-#define NTESTS 1
+#define NTESTS 10000
 
 uint64_t t[NTESTS];
 

@@ -9,7 +9,7 @@
 #include "../fips202.h"
 #include "../cdpre.h"
 
-#define NTESTS 1
+#define NTESTS 1000
 
 int main(void)
 {
@@ -93,12 +93,12 @@ int main(void)
       printf("%02x", key_i[j]);
     printf("\n");
 
-	// Decrypt the encrypted key_i
-	indcpa_dec(key_i, ct_i, sk_i);
-	printf("Encrypted&Decrypted Secret key_i: ");
-	for (j = 0; j < KYBER_SSBYTES; j++)
-	  printf("%02x", key_i[j]);
-	printf("\n");
+	for(j=0;j<KYBER_INDCPA_MSGBYTES;j++) {
+		if(key_i[j] != key_j[j]) {
+			fprintf(stderr, "ERROR\n");
+			return -1;
+		}
+	}
   }
   return 0;
 }

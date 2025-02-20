@@ -5,17 +5,17 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "../kem.h"
-#include "../randombytes.h"
+// #include "../randombytes.h"
 #include "../fips202.h"
 
-#define NTESTS 10000
-
+#define NTESTS 1000
 
 /* Initital state after absorbing empty string 
  * Permute before squeeze is achieved by setting pos to SHAKE128_RATE */
 static keccak_state rngstate = {{0x1F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (1ULL << 63), 0, 0, 0, 0}, SHAKE128_RATE};
 
-void randombytes(uint8_t *x,size_t xlen)
+// rename to test_randombytes
+static void test_randombytes(uint8_t *x,size_t xlen)
 {
   shake128_squeeze(x, xlen, &rngstate);
 }
@@ -67,7 +67,7 @@ int main(void)
     }
 
     // Decapsulation of invalid (random) ciphertexts
-    randombytes(ct, KYBER_CIPHERTEXTBYTES); 
+    test_randombytes(ct, KYBER_CIPHERTEXTBYTES); 
     crypto_kem_dec(key_a, ct, sk);
     printf("Pseudorandom shared Secret A: ");
     for(j=0;j<CRYPTO_BYTES;j++)

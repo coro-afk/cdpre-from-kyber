@@ -20,15 +20,12 @@ all: \
   test/test_vectors_cdpre512 \
   test/test_vectors_cdpre768 \
   test/test_vectors_cdpre1024 \
-  test/test_speed_cdpre512 \
-  test/test_speed_cdpre768 \
-  test/test_speed_cdpre1024 \
-  test/test_kyber512 \
-  test/test_kyber768 \
-  test/test_kyber1024 \
   test/test_vectors512 \
   test/test_vectors768 \
   test/test_vectors1024 \
+  test/test_kyber512 \
+  test/test_kyber768 \
+  test/test_kyber1024 \
   speed
 
 speed: \

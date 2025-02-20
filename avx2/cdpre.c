@@ -192,6 +192,8 @@ void cdpre_rkg(uint8_t sk_i[KYBER_INDCPA_SECRETKEYBYTES],
 
   poly_sub(&v_ij, &v_ij, &temp); // v_ij = t_j^T * rp - s_i^T * u_i
   poly_reduce(&v_ij); // compress v_ij
+  /* optimistic mode: drv = 4 */
+  /* need to add other modes, i.e., different compression size for v_ij */
 
   // pack ciphertext
   pack_ciphertext(rk, &u_ij, &v_ij);
@@ -219,8 +221,9 @@ void cdpre_renc(const uint8_t rk[KYBER_INDCPA_BYTES],
 	poly v_ij, v_i, v_j;
 
 	unpack_ciphertext(&u_j, &v_ij, rk); // parse rk, and u_j = u_ij
+	/* need to be optimized: do not need to unpack/pack u_j */
 	unpack_ciphertext(&u_i, &v_i, c_i); // parse c_i
-
+	
 	poly_add(&v_j, &v_i, &v_ij); // v_j = v_i + v_ij
 	poly_reduce(&v_j); // compress v_j
 	polyvec_reduce(&u_j); // compress u_j

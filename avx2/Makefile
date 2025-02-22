@@ -17,6 +17,7 @@ HEADERSKECCAK   = $(HEADERS) fips202.h fips202x4.h
 .PHONY: all shared clean
 
 all: \
+  speed \
   test/test_vectors_cdpre512 \
   test/test_vectors_cdpre768 \
   test/test_vectors_cdpre1024 \
@@ -26,15 +27,17 @@ all: \
   test/test_kyber512 \
   test/test_kyber768 \
   test/test_kyber1024 \
-  speed
 
 speed: \
+  test/test_speed_satopre512 \
+  test/test_speed_satopre768 \
+  test/test_speed_satopre1024 \
   test/test_speed512 \
   test/test_speed768 \
   test/test_speed1024 \
   test/test_speed_cdpre512 \
   test/test_speed_cdpre768 \
-  test/test_speed_cdpre1024 \
+  test/test_speed_cdpre1024 
 
 shared: \
   libpqcrystals_kyber512_avx2.so \
@@ -121,6 +124,15 @@ test/test_speed_cdpre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h tes
 test/test_speed_cdpre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_cdpre.c
 	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_cdpre.c -o $@
 
+test/test_speed_satopre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_satopre.c
+	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_satopre.c -o $@
+
+test/test_speed_satopre768: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_satopre.c
+	$(CC) $(CFLAGS) -DKYBER_K=3 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_satopre.c -o $@
+
+test/test_speed_satopre1024: $(SOURCESKECCAK) $(HEADERSKECCAK) test/cpucycles.h test/cpucycles.c test/speed_print.h test/speed_print.c test/test_speed_satopre.c
+	$(CC) $(CFLAGS) -DKYBER_K=4 $(SOURCESKECCAK) test/cpucycles.c test/speed_print.c test/test_speed_satopre.c -o $@
+
 clean:
 	-$(RM) -rf *.o *.a *.so
 	-$(RM) -rf test/test_kyber512
@@ -138,4 +150,7 @@ clean:
 	-$(RM) -rf test/test_vectors_cdpre512
 	-$(RM) -rf test/test_vectors_cdpre768
 	-$(RM) -rf test/test_vectors_cdpre1024
+	-$(RM) -rf test/test_speed_satopre512
+	-$(RM) -rf test/test_speed_satopre768
+	-$(RM) -rf test/test_speed_satopre1024
 	-$(RM) -rf keccak4x/KeccakP-1600-times4-SIMD256.o

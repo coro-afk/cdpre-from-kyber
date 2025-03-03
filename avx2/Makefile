@@ -44,7 +44,9 @@ shared: \
   libpqcrystals_kyber768_avx2.so \
   libpqcrystals_kyber1024_avx2.so \
   libpqcrystals_fips202_ref.so \
-  libpqcrystals_fips202x4_avx2.so
+  libpqcrystals_fips202x4_avx2.so \
+  libindcpa.so \
+  libcdpre.so
 
 keccak4x/KeccakP-1600-times4-SIMD256.o: \
   keccak4x/KeccakP-1600-times4-SIMD256.c \
@@ -78,6 +80,16 @@ libpqcrystals_kyber768_avx2.so: $(SOURCES) $(HEADERS) symmetric-shake.c
 libpqcrystals_kyber1024_avx2.so: $(SOURCES) $(HEADERS) symmetric-shake.c
 	$(CC) -shared -fpic $(CFLAGS) -DKYBER_K=4 $(SOURCES) \
 	  symmetric-shake.c -o libpqcrystals_kyber1024_avx2.so
+
+libindcpa.so: indcpa.c polyvec.c poly.c fq.S shuffle.S ntt.S invntt.S \
+	basemul.S consts.c rejsample.c cbd.c verify.c randombytes.c fips202.c fips202x4.c symmetric-shake.c keccak4x/KeccakP-1600-times4-SIMD256.o $(HEADERS)
+	$(CC) -shared -fPIC $(CFLAGS) -DKYBER_K=2 indcpa.c polyvec.c poly.c fq.S shuffle.S ntt.S invntt.S \
+	  basemul.S consts.c rejsample.c cbd.c verify.c randombytes.c fips202.c fips202x4.c symmetric-shake.c keccak4x/KeccakP-1600-times4-SIMD256.o -o libindcpa.so
+
+libcdpre.so: cdpre.c polyvec.c poly.c fq.S shuffle.S ntt.S invntt.S \
+	basemul.S consts.c rejsample.c cbd.c verify.c randombytes.c fips202.c fips202x4.c symmetric-shake.c keccak4x/KeccakP-1600-times4-SIMD256.o indcpa.c $(HEADERS)
+	$(CC) -shared -fPIC $(CFLAGS) -DKYBER_K=2 cdpre.c polyvec.c poly.c 	fq.S shuffle.S ntt.S invntt.S \
+	  basemul.S consts.c rejsample.c cbd.c verify.c randombytes.c fips202.c fips202x4.c symmetric-shake.c keccak4x/KeccakP-1600-times4-SIMD256.o indcpa.c -o libcdpre.so
 
 test/test_vectors_cdpre512: $(SOURCESKECCAK) $(HEADERSKECCAK) test/test_vectors_cdpre.c
 	$(CC) $(CFLAGS) -DKYBER_K=2 $(SOURCESKECCAK) test/test_vectors_cdpre.c -o $@

@@ -13,6 +13,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 import random
 import math
+from tabulate import tabulate
 
 # Create a CFFI object
 ffi = cffi.FFI()
@@ -49,174 +50,174 @@ libcdpre_path = os.path.join(os.path.dirname(__file__), '../avx2/libcdpre.so')
 libindcpa = ffi.dlopen(libindcpa_path)
 libcdpre = ffi.dlopen(libcdpre_path)
 
+def encrypt_data(sek, data):
+    """Encrypt the data using the provided sek."""
+    iv = os.urandom(16)
+    cipher = Cipher(algorithms.AES(sek), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    
+    # Pad the message to be a multiple of 16 bytes
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(data) + padder.finalize()
+    
+    cm = encryptor.update(padded_data) + encryptor.finalize()
+    return cm, iv
+
+def decrypt_data(sek, iv, cm):
+    """Decrypt the data using the provided sek and iv."""
+    cipher = Cipher(algorithms.AES(sek), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    
+    decrypted_padded_data = decryptor.update(cm) + decryptor.finalize()
+    
+    # Unpad the decrypted data
+    unpadder = padding.PKCS7(128).unpadder()
+    dm = unpadder.update(decrypted_padded_data) + unpadder.finalize()
+    return dm
+
 # KDF chain
 def test_kdf_chain(n, e, pka, ska, pkb, skb):
     m = ffi.new("uint8_t[]", KYBER_INDCPA_MSGBYTES)
     ck = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
     rk = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
     dk = generate_aes128_key()
+    results = []
     for i in range(e):
         sek, dk = generate_kdfc_key(i, dk)
     
     for i in range(e, n):
-        print(f'--------Epoch {i}--------')
+        row = [f'Epoch {i}']
         m = f'Simulated data for epoch {i}'.encode()
         dkp = dk
         sek, dk = generate_kdfc_key(i, dk)
         
-        print('(Data owner) Encryption key sek:', sek.hex())
-        print('(Data owner) Derivative key dk:', dkp.hex())
-        print('(Data owner) Data:', bytes(m).decode())
+        row.append(bytes(m).decode())
         
         # Encrypt the data
-        iv = os.urandom(16)
-        cipher = Cipher(algorithms.AES(sek), modes.CBC(iv), backend=default_backend())
-        encryptor = cipher.encryptor()
-        
-        # Pad the message to be a multiple of 16 bytes
-        padder = padding.PKCS7(128).padder()
-        padded_data = padder.update(m) + padder.finalize()
-        
-        cm = encryptor.update(padded_data) + encryptor.finalize()
-        print("(Proxy server) Data ciphertext (Truncated):", cm[:16].hex())
+        cm, iv = encrypt_data(sek, m)
+        row.append(cm[:16].hex())
 
-        
         if i == e:
             # Only need re-encryption in the first epoch
             # Encrypt the dk
             coinse = ffi.new("uint8_t[]", os.urandom(KYBER_SYMBYTES))
             libindcpa.pqcrystals_kyber512_avx2_indcpa_enc(ck, dkp, pka, coinse)
             hck = hashlib.sha256(bytes(ck)).digest()[:16]
-            print("(Proxy server) Key ciphertext (hashed):", hck.hex())
             
             # Compute the re-encryption key
             coinsab = ffi.new("uint8_t[]", os.urandom(KYBER_SYMBYTES))
             libcdpre.cdpre_rkg(ska, pkb, ck, rk, coinsab)
             hrk = hashlib.sha256(bytes(rk)).digest()[:16]
-            print("(Proxy server) Re-encryption Key (hashed):", hrk.hex())
+            print(f'Truncated re-encryption key: {bytes(rk)[:16].hex()}')
             
             # Re-encrypt the key ciphertext
             ckp = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
             libcdpre.cdpre_renc(rk, ck, ckp)
             hckp = hashlib.sha256(bytes(ckp)).digest()[:16]
-            print("(Proxy server) Re-encrypted Ciphertext (hashed):", hckp.hex())
             
             # Decrypt the re-encrypted key ciphertext
             dkpp = ffi.new("uint8_t[]", KYBER_INDCPA_MSGBYTES)
             libindcpa.pqcrystals_kyber512_avx2_indcpa_dec(dkpp, ckp, skb)
             dkpp = bytes(dkpp)[:16]
-            print("(Data buyer) Decrypted Re-encrypted key:", dkpp.hex())
             
             # Retrieve the sek
             sekp, dkk = generate_kdfc_key(i, dkpp)
-            print('(Data buyer) Decrypted sek:', sekp.hex())
             
             # Decrypt the data ciphertext
-            cipher = Cipher(algorithms.AES(sekp), modes.CBC(iv), backend=default_backend())
-            decryptor = cipher.decryptor()
-            
-            decrypted_padded_data = decryptor.update(cm) + decryptor.finalize()
-            
-            # Unpad the decrypted data
-            unpadder = padding.PKCS7(128).unpadder()
-            dm = unpadder.update(decrypted_padded_data) + unpadder.finalize()
-            print("(Data buyer) Decrypted data:", dm.decode())
-
-            print()
+            dm = decrypt_data(sekp, iv, cm)
+            row.append(dm.decode())
         else:
             # Data buyer compute the sek
             sekp, dkk = generate_kdfc_key(i, dkk)
             
             # Decrypt the data ciphertext
-            cipher = Cipher(algorithms.AES(sekp), modes.CBC(iv), backend=default_backend())
-            decryptor = cipher.decryptor()
-            
-            decrypted_padded_data = decryptor.update(cm) + decryptor.finalize()
-            
-            # Unpad the decrypted data
-            unpadder = padding.PKCS7(128).unpadder()
-            dm = unpadder.update(decrypted_padded_data) + unpadder.finalize()
-            print("(Data buyer) Decrypted data:", dm.decode())
-
-            print()
+            dm = decrypt_data(sekp, iv, cm)
+            row.append(dm.decode())
         
+        results.append(row)
+    
+    headers = ["Epoch", "(DO) Data", "(PS) Truncated data ciphertext", "(DB) Decrypted data"]
+    print(tabulate(results, headers=headers, tablefmt="grid"))
+    print()
+
 # KDF tree
 def test_kdf_tree(n, e, pka, ska, pkb, skb):
     l = math.ceil(math.log2(n))
     dk, sek = generate_tree(n)
+    sekp = {}
     m = ffi.new("uint8_t[]", KYBER_INDCPA_MSGBYTES)
     ck = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
+    ckp = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
     rk = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
+    results = []
     
     sek_hex = {k: v.hex() for k, v in sek.items()}
-    print("\nSEK (Leaf Keys):")
-    for k, v in sek_hex.items():
-        print(f"{k}: {v}")
     
     epoch_keys = generate_kdft_keys(e, dk, sek, n)
-    print("\nEpoch Keys:")
-    print(epoch_keys)
     
     for i in e:
-        print(f'--------Epoch {i}--------')
+        row = [f'Epoch {i}']
         m = f'Simulated data for epoch {i}'.encode()
         
-        print('(Data owner) Encryption key sek:', sek[f'{i:0{l}b}'].hex())
-        print('(Data owner) Data:', bytes(m).decode())
+        row.append(bytes(m).decode())
         
         # Encrypt the data
-        iv = os.urandom(16)
-        cipher = Cipher(algorithms.AES(sek[f'{i:0{l}b}']), modes.CBC(iv), backend=default_backend())
-        encryptor = cipher.encryptor()
-        
-        # Pad the message to be a multiple of 16 bytes
-        padder = padding.PKCS7(128).padder()
-        padded_data = padder.update(m) + padder.finalize()
-        
-        cm = encryptor.update(padded_data) + encryptor.finalize()
-        print("(Proxy server) Data ciphertext (Truncated):", cm[:16].hex())
+        cm, iv = encrypt_data(sek[f'{i:0{l}b}'], m)
+        row.append(cm[:16].hex())
 
         if i == e[0]:
             # Only need re-encryption in the first epoch
+            # Proxy server
             # Encrypt the dk
             edk = {}
             for k, v in epoch_keys.items():
                 coinse = ffi.new("uint8_t[]", os.urandom(KYBER_SYMBYTES))
                 libindcpa.pqcrystals_kyber512_avx2_indcpa_enc(ck, v, pka, coinse)
-                edk[k] = ck
-            # Re-encrypt the key ciphertext
+                edk[k] = bytes(ck)
+            
+            # Re-encrypt the dk ciphertext
             rks = {}
-            epoch_keysp = {}
-            stack = []
+            ckps = {}
+            print("\nTruncated re-encryption keys:")
             for k, v in edk.items():
                 coinsab = ffi.new("uint8_t[]", os.urandom(KYBER_SYMBYTES))
                 libcdpre.cdpre_rkg(ska, pkb, v, rk, coinsab)
                 rks[k] = rk
-                
                 # Re-encrypt the key ciphertext
-                ckp = ffi.new("uint8_t[]", KYBER_INDCPA_BYTES)
                 libcdpre.cdpre_renc(rk, v, ckp)
-                
+                ckps[k] = bytes(ckp)
+                print(f"{k}: {v[:16].hex()}")
+            
+            # Data buyer
+            epoch_keysp = {}
+            stack = []
+            for k, v in ckps.items():
                 # Decrypt the re-encrypted key ciphertext
                 dkpp = ffi.new("uint8_t[]", KYBER_INDCPA_MSGBYTES)
-                libindcpa.pqcrystals_kyber512_avx2_indcpa_dec(dkpp, ckp, skb)
+                libindcpa.pqcrystals_kyber512_avx2_indcpa_dec(dkpp, v, skb)
                 epoch_keysp[k] = bytes(dkpp)[:16]
                 stack.append((k, len(k)))
-            print(stack)
-            print(epoch_keysp)
             # Retrieve the sek
-            sekp = {}
             while stack:
                 parent_key, depth = stack.pop()
                 if depth == l:
                     sekp[parent_key] = epoch_keysp[parent_key]
                     continue
-                for i in range(depth, l):
-                    epoch_keysp[parent_key + '0'], epoch_keysp[parent_key + '1'] = kdf(epoch_keysp[parent_key], k[-1])
-                    stack.append((parent_key + '0', i + 1))
-                    stack.append((parent_key + '1', i + 1))
-            
+                else:
+                    direction = 0 if parent_key == '' or parent_key[-1] == '0' else 1
+                    epoch_keysp[parent_key + '0'], epoch_keysp[parent_key + '1'] = kdf(epoch_keysp[parent_key], direction)
+                    stack.append((parent_key + '1', depth + 1))
+                    stack.append((parent_key + '0', depth + 1))
+                    
+        # Decrypt the data ciphertext
+        dm = decrypt_data(sekp[f'{i:0{l}b}'], iv, cm)
+        row.append(dm.decode())
+        
+        results.append(row)
     
+    headers = ["Epoch", "(DO) Data", "(PS) Truncated Data ciphertext", "(DB) Decrypted data"]
+    print(tabulate(results, headers=headers, tablefmt="grid"))
+
 # Define constants
 KYBER_INDCPA_PUBLICKEYBYTES = 800
 KYBER_INDCPA_SECRETKEYBYTES = 1632
@@ -239,23 +240,23 @@ if __name__ == '__main__':
 
     # Print the hash of pks
     hpka = hashlib.sha256(bytes(pka)).digest()
-    print("Alice's Public Key (hashed):", hpka.hex())
+    print(f"Alice's Public Key (hashed): {hpka.hex()}")
     hpkb = hashlib.sha256(bytes(pkb)).digest()
-    print("Bob's Public Key (hashed):", hpkb.hex())
+    print(f"Bob's Public Key (hashed): {hpkb.hex()}")
     print()
     
-    # Test the KDF chain
     n = 8
+    # Test the KDF chain
     print(f'KDF Chain of {n} epochs.')
     e = random.randint(0, n - 1)
     print(f'Data buyer starts subscription at epoch {e}.\n')
     test_kdf_chain(n, e, pka, ska, pkb, skb)
     
     # Test the KDF tree
-    n = 8
     print(f'KDF Tree of {n} epochs.')
-    e = [1, 2]
-    print(f'Data buyer starts subscription at epoch {e}.\n')
+    e = random.sample(range(n), random.randint(1, n))
+    e.sort()
+    print(f'Data buyer subscripts epochs {e}.')
     test_kdf_tree(n, e, pka, ska, pkb, skb)
 
 

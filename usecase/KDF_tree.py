@@ -31,8 +31,11 @@ def generate_kdft_keys(epochs, dk, sek, n):
     """Generate the epoch keys for a list of epochs."""
     l = math.ceil(math.log2(n))
     epochs.sort()
-    if epochs[0] < 0 or epochs[-1] >= n:
-        raise ValueError("Invalid epochs")
+    if epochs != []:
+        if (epochs[0] < 0 or epochs[-1] >= n):
+            raise ValueError("Invalid epochs")
+    else:
+        raise ValueError("No epochs provided")
     epoch_keys = defaultdict(bytes)
     for e in epochs:
         epoch_keys[f'{e:0{l}b}'] = sek[f'{e:0{l}b}']

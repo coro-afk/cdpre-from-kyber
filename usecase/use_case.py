@@ -240,9 +240,9 @@ if __name__ == '__main__':
 
     # Print the hash of pks
     hpka = hashlib.sha256(bytes(pka)).digest()
-    print(f"Alice's Public Key (hashed): {hpka.hex()}")
+    print(f"DO's Public Key (hashed): {hpka.hex()}")
     hpkb = hashlib.sha256(bytes(pkb)).digest()
-    print(f"Bob's Public Key (hashed): {hpkb.hex()}")
+    print(f"DB's Public Key (hashed): {hpkb.hex()}")
     print()
     
     n = 8

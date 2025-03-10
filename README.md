@@ -42,6 +42,10 @@ This produces the executables
 test/test_kyber$ALG
 test/test_vectors$ALG
 test/test_speed$ALG
+
+test/test_vectors_cdpre$ALG
+test/test_speed_cdpre$ALG
+test/test_speed_satopre$ALG
 ```
 where `$ALG` ranges over the parameter sets 512, 768, 1024.
 
@@ -59,14 +63,14 @@ where `$ALG` ranges over the parameter sets 512, 768, 1024.
   By default the Time Step Counter is used. 
   If instead you want to obtain the actual cycle counts from the Performance Measurement Counters, export `CFLAGS="-DUSE_RDPMC"` before compilation.
 
+* `test_vectors_cdpre$ALG` (New) generates 1000 sets of cdPRE test vectors containing keys, ciphertexts, re-encryption key generation, re-ecnryption ciphertexts, and shared secrets whose byte-strings are output in hexadecimal.
+* `test_speed_cdpre$ALG` (New) reports the median and average cycle counts of 1000 executions of internal functions and the API functions for cdPRE re-encryption key generation and proxy re-encryption. By default the Time Step Counter is used. 
+* `test_speed_sato$ALG` (New) reports the median and average cycle counts of 1000 executions of simulated functions for satoPRE key-pair generation, encryption, decryption, re-encryption key generation, and proxy re-encryption. By default the Time Step Counter is used. 
+
+
 Please note that the reference implementation in `ref/` is not optimized for any platform, and, since it prioritises clean code, 
 is significantly slower than a trivially optimized but still platform-independent implementation. 
 Hence benchmarking the reference code does not provide particularly meaningful results.
-
-<!--
-Our Kyber implementations are contained in the [SUPERCOP](https://bench.cr.yp.to) benchmarking framework. 
-See [here](http://bench.cr.yp.to/results-kem.html#amd64-kizomba) for cycle counts on an Intel KabyLake CPU.
--->
 
 ## Shared libraries
 
@@ -74,14 +78,15 @@ All implementations can be compiled into shared libraries by running
 ```sh
 make shared
 ```
-For example in the directory `ref/` of the reference implementation, this produces the libraries
-```sh
-libpqcrystals_kyber$ALG_ref.so
+For the demo system, the required libraries are
 ```
-for all parameter sets `$ALG`, and the required symmetric crypto libraries
+libcdpre.so
+libindcpa.so
 ```
-libpqcrystals_aes256ctr_ref.so
-libpqcrystals_fips202_ref.so
-```
-All global symbols in the libraries lie in the namespaces `pqcrystals_kyber$ALG_ref`, `libpqcrystals_aes256ctr_ref` and `libpqcrystals_fips202_ref`. Hence it is possible to link a program against all libraries simultaneously and obtain access to all implementations for all parameter sets. The corresponding API header file is `ref/api.h`, which contains prototypes for all API functions and preprocessor defines for the key and signature lengths.
+
+## Demo system for a data subscription protocol
+
+The demo system illustrates the usage of epoch symmetric key generation (KDF chain and KDF tree) and cdPRE in a data subscription scenario.
+
+* `demo/demo.py`: For simplicity, the outputs omit the intermediate calculation process and variables. First, the data owner (DO) uploads the encrypted data (simulated data for some epoch) and encrypted key on a proxy server (PS); when a data buyer (DB) requests the data access and pays an amount of money, DO computes a re-encryption key and sends it to PS; PS re-encrypts the key ciphertext; finally, DB accesses the key ciphertext and decrypts it by its private key to get the data encryption key, and decrypt the data ciphertext to obtain the data (simulated data for some epoch).
 

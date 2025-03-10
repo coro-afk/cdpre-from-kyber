@@ -1,3 +1,20 @@
 tvecs1024
 tvecs512
 tvecs768
+
+# 虚拟环境
+venv/
+.env/
+env/
+.venv/
+
+# 字节码缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 其他常见忽略项（按需添加）
+.DS_Store
+*.log
+.vscode/
+.idea/

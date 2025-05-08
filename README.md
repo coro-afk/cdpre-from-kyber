@@ -90,5 +90,5 @@ libindcpa.so
 
 The demo system illustrates the usage of epoch symmetric key generation (KDF chain and KDF tree) and cdPRE in a data subscription scenario.
 
-* `demo/demo.py`: For simplicity, the outputs omit the intermediate calculation process and variables. First, the data owner (DO) uploads the encrypted data (simulated data for some epoch) and encrypted key on a proxy server (PS); when a data buyer (DB) requests the data access and pays an amount of money, DO computes a re-encryption key and sends it to PS; PS re-encrypts the key ciphertext; finally, DB accesses the key ciphertext and decrypts it by its private key to get the data encryption key, and decrypt the data ciphertext to obtain the data (simulated data for some epoch).
+* `demo/demo.py`: For simplicity, the outputs omit the intermediate calculation process and variables. First, Alice (delegator) uploads the encrypted data (simulated data for some epoch) and encrypted key on a proxy server (PS); when Bob (delegatee) requests the data access, Alice computes a re-encryption key and sends it to PS; PS re-encrypts the key ciphertext; finally, DB accesses the key ciphertext and decrypts it by its private key to get the data encryption key, and decrypt the data ciphertext to obtain the data (simulated data for some epoch).
 

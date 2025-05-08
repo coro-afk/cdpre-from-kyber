@@ -1,8 +1,10 @@
 # Ciphertext-dependent proxy re-encryption scheme from Kyber
 
+This repository is a fork from [Kyber](https://www.pq-crystals.org/kyber/).
+
 This repository contains the implementation of a cipheretext-dependent Proxy Re-Encryption scheme based on Kyber.
 
-The original Kyber description:
+The Kyber description:
 > This repository contains the official reference implementation of the [Kyber](https://www.pq-crystals.org/kyber/) key encapsulation mechanism, 
 > and an optimized implementation for x86 CPUs supporting the AVX2 instruction set. 
 > Kyber has been selected for standardization in [round 3](https://csrc.nist.gov/Projects/post-quantum-cryptography/round-3-submissions) 

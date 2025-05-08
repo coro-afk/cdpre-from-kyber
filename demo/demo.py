@@ -136,7 +136,7 @@ def test_kdf_chain(n, e, pka, ska, pkb, skb):
         
         results.append(row)
     
-    headers = ["Epoch", "(DO) Data", "(PS) Truncated data ciphertext", "(DB) Decrypted data"]
+    headers = ["Epoch", "(Alice) Data", "(PS) Truncated data ciphertext", "(Bob) Decrypted data"]
     print(tabulate(results, headers=headers, tablefmt="grid"))
     print()
 
@@ -215,7 +215,7 @@ def test_kdf_tree(n, e, pka, ska, pkb, skb):
         
         results.append(row)
     
-    headers = ["Epoch", "(DO) Data", "(PS) Truncated Data ciphertext", "(DB) Decrypted data"]
+    headers = ["Epoch", "(Alice) Data", "(PS) Truncated Data ciphertext", "(Bob) Decrypted data"]
     print(tabulate(results, headers=headers, tablefmt="grid"))
 
 # Define constants
@@ -240,9 +240,9 @@ if __name__ == '__main__':
 
     # Print the hash of pks
     hpka = hashlib.sha256(bytes(pka)).digest()
-    print(f"DO's Public Key (hashed): {hpka.hex()}")
+    print(f"Alice's Public Key (hashed): {hpka.hex()}")
     hpkb = hashlib.sha256(bytes(pkb)).digest()
-    print(f"DB's Public Key (hashed): {hpkb.hex()}")
+    print(f"Bob's Public Key (hashed): {hpkb.hex()}")
     print()
     
     n = 8
